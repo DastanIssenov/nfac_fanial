@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Catalog</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    if (!localStorage.getItem("loggedInUser")) {
+      window.location.href = "login.html";
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h1>🎵 Music Catalog</h1>
+      <div>
+        <button onclick="logout()">Log out</button>
+        <button onclick="window.location.href='change-password.html'">Change Password</button>
+      </div>
+    </div>
+
+    <section id="yt-download">
+      <h2>🎬 Add from YouTube</h2>
+      <input type="text" id="youtube-url" placeholder="Enter YouTube URL" />
+      <button onclick="submitYoutube()">Download & Add</button>
+    </section>
+
+    <section id="albums"></section>
+    <section id="track-list"></section>
+
+    <div id="player" class="hidden">
+      <img id="player-cover" src="" alt="Cover" />
+      <h2 id="player-title"></h2>
+      <h3 id="player-artist"></h3>
+      <input type="range" id="progress" value="0" />
+    </div>
+  </div>
+
+  <div id="album-modal" style="display:none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 10px; width: 300px;">
+      <h3>Add to Album</h3>
+      <select id="album-select" style="width: 100%; margin-bottom: 10px;"></select>
+      <hr>
+      <input type="text" id="new-album-name" placeholder="New Album Name" />
+      <input type="file" id="new-album-image" accept="image/*" />
+      <img id="preview-album-cover" src="" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; margin-top: 10px; display: none;" />
+      <button onclick="confirmAddToAlbum()">Add</button>
+      <button onclick="closeAlbumModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "login.html";
+    }
+
+    function openAlbumModal(trackId) {
+      document.getElementById("album-modal").style.display = "flex";
+      document.getElementById("album-modal").dataset.trackId = trackId;
+
+      const select = document.getElementById("album-select");
+      select.innerHTML = "";
+      albums.forEach(album => {
+        if (album.id !== 998 && album.id !== 999) {
+          const option = document.createElement("option");
+          option.value = album.id;
+          option.textContent = album.title;
+          select.appendChild(option);
+        }
+      });
+
+      document.getElementById("new-album-name").value = "";
+      document.getElementById("new-album-image").value = "";
+      const preview = document.getElementById("preview-album-cover");
+      preview.src = "";
+      preview.style.display = "none";
+    }
+
+    function closeAlbumModal() {
+      document.getElementById("album-modal").style.display = "none";
+    }
+
+    document.getElementById("new-album-image").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const preview = document.getElementById("preview-album-cover");
+        preview.src = evt.target.result;
+        preview.style.display = "block";
+        preview.dataset.base64 = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+
+  <script src="app.js"></script>
+</body>
+</html>

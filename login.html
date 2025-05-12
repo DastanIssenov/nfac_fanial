@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login / Register</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+    }
+    input, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      box-sizing: border-box;
+    }
+    h2 {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Login</h2>
+    <input type="text" id="login-username" placeholder="Username">
+    <input type="password" id="login-password" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <h2>Create Account</h2>
+    <input type="text" id="register-username" placeholder="New Username">
+    <input type="password" id="register-password" placeholder="New Password">
+    <input type="password" id="register-confirm" placeholder="Confirm Password">
+    <button onclick="register()">Register</button>
+  </div>
+
+  <script>
+    function getUsers() {
+      return JSON.parse(localStorage.getItem('users') || '{}');
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    function login() {
+      const users = getUsers();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (users[username] && users[username] === password) {
+        localStorage.setItem('loggedInUser', username);
+
+        if (!localStorage.getItem(`${username}_tracks`)) {
+          localStorage.setItem(`${username}_tracks`, '[]');
+        }
+        if (!localStorage.getItem(`${username}_albums`)) {
+          localStorage.setItem(`${username}_albums`, '[]');
+        }
+        if (!localStorage.getItem(`${username}_favorites`)) {
+          localStorage.setItem(`${username}_favorites`, '[]');
+        }
+
+        window.location.href = 'index.html';
+      } else {
+        alert('Invalid username or password');
+      }
+    }
+
+    function register() {
+        const users = getUsers();
+        const usernameEl = document.getElementById('register-username');
+        const passwordEl = document.getElementById('register-password');
+        const confirmEl = document.getElementById('register-confirm');
+
+        const username = usernameEl.value.trim();
+        const password = passwordEl.value;
+        const confirm = confirmEl.value;
+
+        if (password !== confirm) {
+            alert('Passwords do not match');
+            return;
+        }
+
+        if (users[username]) {
+            alert('Username already exists');
+        } else {
+            users[username] = password;
+            saveUsers(users);
+            alert('Account created! You can now login.');
+            usernameEl.value = "";
+            passwordEl.value = "";
+            confirmEl.value = "";
+        }
+    }
+  </script>
+</body>
+</html>
